@@ -8,5 +8,6 @@ user.post('/login', userController.login)
 
 //private
 user.get('/currentUser', authMiddleware, userController.getCurrentUser)
+user.post('/avatar-profile', authMiddleware, userController.avatarProfile )
 
 module.exports = user

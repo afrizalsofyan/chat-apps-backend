@@ -40,8 +40,12 @@ exports.login = async (req, res) => {
     } else {
       return response(res, 'Email or password wrong.', null, null, 400)
     }
+    User.userModel.on('error', ()=>console.log('this is error', error))
   } catch (error) {
-    return response(res, error.message)
+    if(error.message.includes('findOne')){
+      return response(res, error.message, null, null, 502)
+    }
+    return response(res, error.message, null, null, 400)
   }
 }
 
@@ -55,6 +59,20 @@ exports.getCurrentUser = async (req, res) => {
     } else {
       return response(res, 'User not found.', null, null, 400)
     }
+  } catch (error) {
+    return response(res, error.message, null, null, 400)
+  }
+}
+
+exports.avatarProfile = async (req, res) => {
+  try {
+    const userId = req.authUser.id
+    const picture = req.body.userPicture
+    const userData = await User.userModel.findByIdAndUpdate(userId, {
+      isPictureSet: true,
+      userPicture: picture
+    })
+    return response(res, 'success updated avatar', {isPictureSet: userData.isPictureSet, userPicture: userData.userPicture})
   } catch (error) {
     return response(res, error.message, null, null, 400)
   }

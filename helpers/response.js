@@ -1,6 +1,6 @@
 const response = (res, msg, results, pageInfo, status=200) => {
   let success = true;
-  if(success >= 400) {
+  if(status >= 400) {
     success = false
   }
   const data = {
