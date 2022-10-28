@@ -70,9 +70,19 @@ exports.avatarProfile = async (req, res) => {
     const picture = req.body.userPicture
     const userData = await User.userModel.findByIdAndUpdate(userId, {
       isPictureSet: true,
-      userPicture: picture
-    })
+      userPicture: picture,
+    },{returnOriginal: false, new: true})
     return response(res, 'success updated avatar', {isPictureSet: userData.isPictureSet, userPicture: userData.userPicture})
+  } catch (error) {
+    return response(res, error.message, null, null, 400)
+  }
+}
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const userId = req.authUser.id
+    const users = await User.userModel.find({_id: {$ne: userId}}).select(['email', 'username', 'userPicture', '_id'])
+    return response(res, 'all users', users)
   } catch (error) {
     return response(res, error.message, null, null, 400)
   }
