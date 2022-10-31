@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const client = require('./helpers/mongoConfig')
+const socket = require('socket.io')
 
 const app = express()
 const PORT = process.env.PORT
@@ -22,4 +23,27 @@ app.get('/', (_, res) => {
 
 client()
 
-app.listen(PORT, () => console.log(`Server Online, running at port ${PORT}`))
+const indexServer = app.listen(PORT, () => console.log(`Server Online, running at port ${PORT}`))
+
+const io = socket(indexServer, {
+  cors: {
+    origin: process.env.ORIGIN_URL,
+    credentials: true,
+  }
+})
+
+global.onlineUser = new Map();
+
+io.on('connection', (socket) => {
+  global.chatSocket = socket
+  socket.on('add-user', (userId) => {
+    onlineUser.set(userId, socket.id)
+  })
+
+  socket.on('send-msg', (data) => {
+    const sendUserSocket = onlineUser.get(data.recipient)
+    if(sendUserSocket) {
+      socket.to(sendUserSocket).emit('msg-recieve', data.message)
+    }
+  })
+})

@@ -53,7 +53,7 @@ exports.getCurrentUser = async (req, res) => {
   const {email} = req.authUser
   try {
     const user = await User.userModel.findOne({email})
-    const dataUser = {email: user.email, username: user.username, picture: user.userPicture, pictureSet: user.isPictureSet}
+    const dataUser = {id: user._id, email: user.email, username: user.username, picture: user.userPicture, pictureSet: user.isPictureSet}
     if(user) {
       return response(res, 'User found.', dataUser)
     } else {
